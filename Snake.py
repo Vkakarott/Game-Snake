@@ -93,7 +93,7 @@ while True:
         cobra = pygame.draw.rect(screen, (green), (x_cobra, y_cobra, 20, 20))
         com = pygame.draw.rect(screen, red, (xc, yc, 20, 20))
 
-        if cobra.collidedict(com):
+        if cobra.colliderect(com):
             xc = randint(40, 600)
             yc = randint(50, 430)
             pontos += 1
