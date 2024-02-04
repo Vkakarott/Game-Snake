@@ -3,141 +3,174 @@ from pygame.locals import *
 from sys import exit
 from random import randint
 
-pygame.init()
-
+# cores
 red = (255, 0, 0)
 black = (0, 0, 0)
 white = (255, 255, 255)
-green = (10, 10, 255)
+green = (20, 255, 20)
 
-width = 640
-height = 480
+# inicializa o pygame
+pygame.init()
 
-x_cobra = int(width/2)
+# dimensões da tela
+width = 1280
+height = 720
+
+# posicao inicial da cobra
+x_cobra = int(width/2) 
 y_cobra = int(height/2)
-              
-vel = 10
-x_control = vel
-y_control = 0
 
-xc = randint(40, 600)
-yc = randint(50, 430)
+velocidade = 20
+x_controle = velocidade
+y_controle = 0
+
+# posicao da comida
+x_maca = randint(2, 63) * 20
+y_maca = randint(5, 35) * 20
 
 pontos = 0
-font = pygame.font.SysFont('arial', 40, bold=True)
+fonte = pygame.font.SysFont('arial', 40, bold=True, italic=True)
 
-screen = pygame.display.set_mode((width, height))
+tela = pygame.display.set_mode((width, height))
 pygame.display.set_caption('Snake')
-clock = pygame.time.Clock()
+relogio = pygame.time.Clock()
+lista_cobra = []
+comprimento_inicial = 5
+gameOver = False
 
-listC = []
-comprimentoIni = 5
-gameOver= False
+def aumenta_cobra(lista_cobra):
+    for XeY in lista_cobra:
+        pygame.draw.rect(tela, green, (XeY[0], XeY[1], 20, 20))
 
-def upCobra(listC):
-    for XeY in listC:
-        pygame.draw.rect(screen, green, (XeY[0], XeY[1], 20, 20))
-
-def reset():
-    global pontos, comprimentoIni, x_cobra, y_cobra, listC, listCab, xc, yc, gameOver
+def reiniciar_jogo():
+    global pontos, comprimento_inicial, x_cobra, y_cobra, lista_cobra, lista_cabeca, x_maca, y_maca, gameOver
     pontos = 0
-    comprimentoIni = 5
-    x_cobra = int(width/2)
+    comprimento_inicial = 5
+    x_cobra = int(width/2) 
     y_cobra = int(height/2)
-    listC = []
-    listCab = []
-    xc = randint(40, 600)
-    yc = randint(50, 430)
+    lista_cobra = []
+    lista_cabeca = []
+    x_maca = randint(2, 63) * 20
+    y_maca = randint(5, 35) * 20
     gameOver = False
 
 while True:
-    clock.tick(30)
-    screen.fill((255, 255, 255))
-    mens = f'Pontos: {pontos}'
-    txtF = font.render(mens, True, black)
-
+    relogio.tick(30)
+    tela.fill(white)
+    
+    mensagem = f'Pontos: {pontos}'
+    texto_formatado = fonte.render(mensagem, True, black)
+    
     for event in pygame.event.get():
         if event.type == QUIT:
             pygame.quit()
             exit()
-
+        
         if event.type == KEYDOWN:
             if event.key == K_a:
-                if x_control == vel:
+                if x_controle == velocidade:
                     pass
                 else:
-                    x_control = -vel
-                    y_control = 0
+                    x_controle = -velocidade
+                    y_controle = 0
             if event.key == K_d:
-                if x_control == -vel:
+                if x_controle == -velocidade:
                     pass
                 else:
-                    x_control = vel
-                    y_control = 0
+                    x_controle = velocidade
+                    y_controle = 0
             if event.key == K_w:
-                if y_control == vel:
+                if y_controle == velocidade:
                     pass
                 else:
-                    y_control = -vel
-                    x_control = 0
+                    y_controle = -velocidade
+                    x_controle = 0
             if event.key == K_s:
-                if y_control == -vel:
+                if y_controle == -velocidade:
                     pass
                 else:
-                    y_control = vel
-                    x_control = 0
-            
-        x_cobra += x_control
-        y_cobra += y_control
+                    y_controle = velocidade
+                    x_controle = 0
+            if event.key == K_LEFT:
+                if x_controle == velocidade:
+                    pass
+                else:
+                    x_controle = -velocidade
+                    y_controle = 0
+            if event.key == K_RIGHT:
+                if x_controle == -velocidade:
+                    pass
+                else:
+                    x_controle = velocidade
+                    y_controle = 0
+            if event.key == K_UP:
+                if y_controle == velocidade:
+                    pass
+                else:
+                    y_controle = -velocidade
+                    x_controle = 0
+            if event.key == K_DOWN:
+                if y_controle == -velocidade:
+                    pass
+                else:
+                    y_controle = velocidade
+                    x_controle = 0
 
-        cobra = pygame.draw.rect(screen, (green), (x_cobra, y_cobra, 20, 20))
-        com = pygame.draw.rect(screen, red, (xc, yc, 20, 20))
-
-        if cobra.colliderect(com):
-            xc = randint(40, 600)
-            yc = randint(50, 430)
-            pontos += 1
-            comprimentoIni += 1
-
-        listCab = []
-        listCab.append(x_cobra)
-        listCab.append(y_cobra)
-
-        listC.append(listCab)
-
-        if listC.count(listCab) > 1:
-            fonte = pygame.font.SysFont('arial', 20, True, False)
-            mens = 'Game over! Precione R para jogar novamente'
-            textF = fonte.render(mens, True, white)
-            retTxt = textF.get_rect()
-            gameOver = True
-            while gameOver:
-                screen.fill(white)
-                for event in pygame.event.get():
-                    if event.type == QUIT:
-                        pygame.quit()
-                        exit()
-                    if event.type == KEYDOWN:
-                        if event.key == K_r:
-                            reset()
-                retTxt.center = (width/2, height/2)
-                screen.blit(txtF, retTxt)
-                pygame.display.update()
-
-        if x_cobra > width:
-            x_cobra = 0
-        if x_cobra < 0:
-            x_cobra = width
-        if y_cobra < 0:
-            y_cobra = height
-        if y_cobra > height:
-            y_cobra = 0
+    x_cobra = x_cobra + x_controle
+    y_cobra = y_cobra + y_controle
         
-        if len(listC) > comprimentoIni:
-            del listC[0]
+    cobra = pygame.draw.rect(tela, green, (x_cobra,y_cobra,20,20))
+    maca = pygame.draw.rect(tela, red, (x_maca,y_maca,20,20))
+    
+    if cobra.colliderect(maca):
+        x_maca = randint(2, 63) * 20
+        y_maca = randint(5, 35) * 20
+        pontos += 1
+        comprimento_inicial = comprimento_inicial + 1
 
-        upCobra(listC)
+    lista_cabeca = []
+    lista_cabeca.append(x_cobra)
+    lista_cabeca.append(y_cobra)
+    
+    lista_cobra.append(lista_cabeca)
 
-        screen.blit(txtF, (450, 40))
+    if lista_cobra.count(lista_cabeca) > 1:
+        fonte2 = pygame.font.SysFont('arial', 20, True, True)
+        mensagem = 'Game over! Pressione a tecla R para jogar novamente'
+        texto_formatado = fonte2.render(mensagem, True, black)
+        ret_texto = texto_formatado.get_rect()
 
-        pygame.display.update()
+        gameOver = True
+        while gameOver:
+            tela.fill(white)
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    exit()
+                if event.type == KEYDOWN:
+                    if event.key == K_r:
+                        reiniciar_jogo()
+
+            ret_texto.center = (width//2, height//2) 
+            tela.blit(texto_formatado, ret_texto)
+            pygame.display.update()
+
+    
+    if x_cobra > width:
+        x_cobra = 0
+    if x_cobra < 0:
+        x_cobra = width
+    if y_cobra < 0:
+        y_cobra = height
+    if y_cobra > height:
+        y_cobra = 0
+
+    if len(lista_cobra) > comprimento_inicial:
+        del lista_cobra[0]
+
+    aumenta_cobra(lista_cobra)
+
+    tela.blit(texto_formatado, (550,30))
+
+    
+    pygame.display.update()
